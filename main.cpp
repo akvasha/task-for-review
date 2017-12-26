@@ -128,6 +128,7 @@ void merge_sort(List *l) {
         right_list->push_back(*(x++));
     merge_sort(left_list);
     merge_sort(right_list);
+    delete l;
     *l = *merge(left_list, right_list);
     delete left_list;
     delete right_list;
