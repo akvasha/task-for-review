@@ -1,10 +1,12 @@
 #include <bits/stdc++.h>
-using namespace std;
 template<class T> bool uin(T &a, T b) { return a > b ? (a = b, true) : false; }
 template<class T> bool uax(T &a, T b) { return a < b ? (a = b, true) : false; }
 #define forn(i, n) for (int i = 0; i < (int)(n); i++)
 #define forab(i, a, b) for (int i = (int)(a); i < (int)(b); i++)
 const int maxn = int(1e6) + 10;
+
+using std::cin;
+using std::cout;
 
 struct Node {
     Node *r;
