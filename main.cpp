@@ -1,9 +1,5 @@
 #include <bits/stdc++.h>
-template<class T> bool uin(T &a, T b) { return a > b ? (a = b, true) : false; }
-template<class T> bool uax(T &a, T b) { return a < b ? (a = b, true) : false; }
 #define forn(i, n) for (int i = 0; i < (int)(n); i++)
-#define forab(i, a, b) for (int i = (int)(a); i < (int)(b); i++)
-const int maxn = int(1e6) + 10;
 
 using std::cin;
 using std::cout;
@@ -15,137 +11,100 @@ struct Node {
     Node(int _val) : val(_val), r(nullptr) {}
 };
 
-struct List {
-    Node *first; Node *last; Node *useless;
-    size_t sz;
-
-    List() : first(nullptr), last(nullptr), useless(new Node(-1)), sz(0) {}
-
-    void push_back(int v) {
-        Node *curr = new Node(v);
-        if (sz == 0) {
-            first = last = curr;
+void merge(Node **res, Node *left, Node *right) {
+    *res = nullptr;
+    Node head;
+    if (left == nullptr) {
+        *res = right;
+        return;
+    }
+    if (right == nullptr) {
+        *res = left;
+        return;
+    }
+    if (left->val < right->val) {
+        *res = left;
+        left = left->r;
+    } else {
+        *res = right;
+        right = right->r;
+    }
+    head.r = *res;
+    while (left && right) {
+        if (left->val < right->val) {
+            (*res)->r = left;
+            left = left->r;
         } else {
-            last->r = curr;
-            last = curr;
+            (*res)->r = right;
+            right = right->r;
         }
-        last->r = useless;
-        ++sz;
+        (*res) = (*res)->r;
     }
-
-    void push_front(int v) {
-        Node *curr = new Node(v);
-        if (sz == 0) {
-            first = last = curr;
-        } else {
-            curr->r = first;
-            first = curr;
-        }
-        useless->r = first;
-        ++sz;
+    while (left) {
+        (*res)->r = left;
+        left = left->r;
+        (*res) = (*res)->r;
     }
-
-    size_t size() const {
-        return sz;
+    while (right) {
+        (*res)->r = right;
+        right = right->r;
+        (*res) = (*res)->r;
     }
-
-    struct list_iterator {
-        Node *it;
-
-        list_iterator(Node *_it) : it(_it) {}
-
-        bool operator == (list_iterator other) {
-            return it == other.it;
-        }
-
-        bool operator != (list_iterator other) {
-            return !(it == other.it);
-        }
-
-        int& operator*() {
-            return it->val;
-        }
-
-        list_iterator& operator++() {
-            it = it->r;
-            return *this;
-        }
-
-        list_iterator operator++(int) {
-            auto curr = *this;
-            it = it->r;
-            return curr;
-        }
-    };
-
-    list_iterator begin() {
-        return first;
-    }
-
-    list_iterator end() {
-        return useless;
-    }
-
-    ~List() {
-        if (sz == 0)
-            return;
-        while (first != last) {
-            Node *curr = first->r;
-            delete first;
-            first = curr;
-        }
-        delete first;
-        first = last = nullptr;
-        delete useless;
-    }
-};
-
-List* merge(List *l, List *r) {
-    List *res = new List;
-    auto first_it = l->begin(), second_it = r->begin();
-    while (first_it != l->end() && second_it != r->end()) {
-        if (*(first_it) < *(second_it))
-            res->push_back(*(first_it++));
-        else
-            res->push_back(*(second_it++));
-    }
-    while (first_it != l->end())
-        res->push_back(*(first_it++));
-    while (second_it != r->end())
-        res->push_back(*(second_it++));
-    return res;
+    *res = head.r;
 }
 
-void merge_sort(List *l) {
-    if (l->size() == 1)
+void divide(Node *start, Node **left, Node **right) {
+    Node *two_steps = nullptr, *one_step = nullptr;
+    if (start == nullptr || start->r == nullptr) {
+        (*left) = start;
+        (*right) = nullptr;
         return;
-    int mid = (l->size()) >> 1;
-    List *left_list = new List, *right_list = new List;
-    auto x = l->begin();
-    while (left_list->size() != mid)
-        left_list->push_back(*(x++));
-    while (x != l->end())
-        right_list->push_back(*(x++));
-    merge_sort(left_list);
-    merge_sort(right_list);
-    delete l;
-    *l = *merge(left_list, right_list);
-    delete left_list;
-    delete right_list;
+    }
+    one_step = start;
+    two_steps = start->r;
+    while (two_steps != nullptr) {
+        two_steps = two_steps->r;
+        if (two_steps != nullptr) {
+            two_steps = two_steps->r;
+            one_step = one_step->r;
+        }
+    }
+
+    (*left) = start;
+    (*right) = one_step->r;
+    one_step->r = nullptr;
+}
+
+void merge_sort(Node **head) {
+    Node *left = nullptr, *right = nullptr;
+    if (((*head) == nullptr) || ((*head)->r == nullptr))
+        return;
+    divide(*head, &left, &right);
+    merge_sort(&left);
+    merge_sort(&right);
+    merge(head, left, right);
 }
 
 int main() {
-    List *l = new List;
+    Node *head = nullptr;
+    Node start = 0;
     size_t n = 0;
     cin >> n;
     forn(i, n) {
-        int val;
-        cin >> val;
-        l->push_back(val);
+        int v;
+        cin >> v;
+        if (i == 0) {
+            head = new Node(v);
+            start.r = head;
+        } else {
+            head->r = new Node(v);
+            head = head->r;
+        }
     }
-    merge_sort(l);
-    auto x = l->begin();
-    while (x != l->end())
-        cout << *(x++) << " ";
+    merge_sort(&(start.r));
+    while (start.r != nullptr) {
+        cout << start.r->val << " ";
+        start.r = (start.r)->r;
+    }
     return 0;
 }
