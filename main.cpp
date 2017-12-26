@@ -6,21 +6,21 @@ template<class T> bool uax(T &a, T b) { return a < b ? (a = b, true) : false; }
 #define forab(i, a, b) for (int i = (int)(a); i < (int)(b); i++)
 const int maxn = int(1e6) + 10;
 
-struct node {
-    node *r;
+struct Node {
+    Node *r;
     int val;
-    node() : val(0), r(nullptr) {}
-    node(int _val) : val(_val), r(nullptr) {}
+    Node() : val(0), r(nullptr) {}
+    Node(int _val) : val(_val), r(nullptr) {}
 };
 
 struct List {
-    node *first; node *last; node *useless;
+    Node *first; Node *last; Node *useless;
     size_t sz;
 
-    List() : first(nullptr), last(nullptr), useless(new node(-1)), sz(0) {}
+    List() : first(nullptr), last(nullptr), useless(new Node(-1)), sz(0) {}
 
     void push_back(int v) {
-        node *curr = new node(v);
+        Node *curr = new Node(v);
         if (sz == 0) {
             first = last = curr;
         } else {
@@ -32,7 +32,7 @@ struct List {
     }
 
     void push_front(int v) {
-        node *curr = new node(v);
+        Node *curr = new Node(v);
         if (sz == 0) {
             first = last = curr;
         } else {
@@ -48,9 +48,9 @@ struct List {
     }
 
     struct list_iterator {
-        node *it;
+        Node *it;
 
-        list_iterator(node *_it) : it(_it) {}
+        list_iterator(Node *_it) : it(_it) {}
 
         bool operator == (list_iterator other) {
             return it == other.it;
@@ -88,7 +88,7 @@ struct List {
         if (sz == 0)
             return;
         while (first != last) {
-            node *curr = first->r;
+            Node *curr = first->r;
             delete first;
             first = curr;
         }
@@ -98,42 +98,42 @@ struct List {
     }
 };
 
-void merge(List *(&res), List *l, List *r) {
-    auto s1 = l->begin(), s2 = r->begin();
-    while (s1 != l->end() && s2 != r->end()) {
-        if (*(s1) < *(s2))
-            res->push_back(*(s1++));
+List* merge(List *l, List *r) {
+    List *res = new List;
+    auto first_it = l->begin(), second_it = r->begin();
+    while (first_it != l->end() && second_it != r->end()) {
+        if (*(first_it) < *(second_it))
+            res->push_back(*(first_it++));
         else
-            res->push_back(*(s2++));
+            res->push_back(*(second_it++));
     }
-    while (s1 != l->end())
-        res->push_back(*(s1++));
-    while (s2 != r->end())
-        res->push_back(*(s2++));
+    while (first_it != l->end())
+        res->push_back(*(first_it++));
+    while (second_it != r->end())
+        res->push_back(*(second_it++));
+    return res;
 }
 
-void merge_sort(List *(&l)) {
+void merge_sort(List *l) {
     if (l->size() == 1)
         return;
     int mid = (l->size()) >> 1;
-    List *l1 = new List, *l2 = new List;
+    List *left_list = new List, *right_list = new List;
     auto x = l->begin();
-    while (l1->size() != mid)
-        l1->push_back(*(x++));
+    while (left_list->size() != mid)
+        left_list->push_back(*(x++));
     while (x != l->end())
-        l2->push_back(*(x++));
-    merge_sort(l1);
-    merge_sort(l2);
-    delete l;
-    l = new List;
-    merge(l, l1, l2);
-    delete l1;
-    delete l2;
+        right_list->push_back(*(x++));
+    merge_sort(left_list);
+    merge_sort(right_list);
+    *l = *merge(left_list, right_list);
+    delete left_list;
+    delete right_list;
 }
 
 int main() {
     List *l = new List;
-    int n;
+    size_t n = 0;
     cin >> n;
     forn(i, n) {
         int val;
