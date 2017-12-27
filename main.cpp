@@ -4,16 +4,18 @@
 using std::cin;
 using std::cout;
 
+template<typename T>
 struct Node {
     Node *r;
-    int val;
-    Node() : val(0), r(nullptr) {}
-    Node(int _val) : val(_val), r(nullptr) {}
+    T val;
+    Node() : val(T(0)), r(nullptr) {}
+    Node(T _val) : val(_val), r(nullptr) {}
 };
 
-void merge(Node **res, Node *left, Node *right) {
+template<typename T>
+void merge(Node<T> **res, Node<T> *left, Node<T> *right) {
     *res = nullptr;
-    Node head;
+    Node<T> head;
     if (left == nullptr) {
         *res = right;
         return;
@@ -53,8 +55,9 @@ void merge(Node **res, Node *left, Node *right) {
     *res = head.r;
 }
 
-void divide(Node *start, Node **left, Node **right) {
-    Node *two_steps = nullptr, *one_step = nullptr;
+template<typename T>
+void divide(Node<T> *start, Node<T> **left, Node<T> **right) {
+    Node<T> *two_steps = nullptr, *one_step = nullptr;
     if (start == nullptr || start->r == nullptr) {
         (*left) = start;
         (*right) = nullptr;
@@ -75,8 +78,9 @@ void divide(Node *start, Node **left, Node **right) {
     one_step->r = nullptr;
 }
 
-void merge_sort(Node **head) {
-    Node *left = nullptr, *right = nullptr;
+template<typename T>
+void merge_sort(Node<T> **head) {
+    Node<T> *left = nullptr, *right = nullptr;
     if (((*head) == nullptr) || ((*head)->r == nullptr))
         return;
     divide(*head, &left, &right);
@@ -86,18 +90,18 @@ void merge_sort(Node **head) {
 }
 
 int main() {
-    Node *head = nullptr;
-    Node start = 0;
+    Node<int> *head = nullptr;
+    Node<int> start = 0;
     size_t n = 0;
     cin >> n;
     forn(i, n) {
         int v;
         cin >> v;
         if (i == 0) {
-            head = new Node(v);
+            head = new Node<int>(v);
             start.r = head;
         } else {
-            head->r = new Node(v);
+            head->r = new Node<int>(v);
             head = head->r;
         }
     }
