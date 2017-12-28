@@ -1,5 +1,4 @@
-#include <bits/stdc++.h>
-#define forn(i, n) for (int i = 0; i < (int)(n); i++)
+#include <iostream>
 
 using std::cin;
 using std::cout;
@@ -94,8 +93,8 @@ int main() {
     Node<int> start = 0;
     size_t n = 0;
     cin >> n;
-    forn(i, n) {
-        int v;
+    for (int i = 0; i < n; ++i) {
+        int v = 0;
         cin >> v;
         if (i == 0) {
             head = new Node<int>(v);
@@ -109,6 +108,11 @@ int main() {
     while (start.r != nullptr) {
         cout << start.r->val << " ";
         start.r = (start.r)->r;
+    }
+    while (start.r != nullptr) {
+        Node<int> *curr = start.r;
+        delete start.r;
+        start.r = curr;
     }
     return 0;
 }
